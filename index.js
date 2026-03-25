@@ -230,6 +230,11 @@ client.on(Events.InteractionCreate, async interaction => {
 // ---------------------
 const token = process.env.BOT_TOKEN;
 
+if (!token) {
+    console.error("Hata: BOT_TOKEN environment variable tanımlı değil!");
+    process.exit(1); // Botu durdur
+}
+
 client.login(token);
 
 client.once(Events.ClientReady, () => {
@@ -237,7 +242,7 @@ client.once(Events.ClientReady, () => {
 
     // Opsiyonel: Discord’daki bot statüsünü ayarlayabilirsin
     client.user.setPresence({
-        activities: [{ name: "Sunucunuzu koruyor!", type: 0 }], // type: 0 = Playing
+        activities: [{ name: "Sunucunuzu koruyor!", type: 0 }], // 0 = Playing
         status: "online"
     });
 });
