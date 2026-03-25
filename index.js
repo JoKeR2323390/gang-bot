@@ -228,4 +228,4 @@ client.on(Events.InteractionCreate, async interaction => {
 // ---------------------
 // BOT LOGIN
 // ---------------------
-client.login(config.BOT_TOKEN);
+client.login(process.env.BOT_TOKEN);
