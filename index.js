@@ -226,6 +226,18 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 // ---------------------
-// BOT LOGIN
+// BOT LOGIN VE READY
 // ---------------------
-client.login(process.env.BOT_TOKEN);
+const token = process.env.BOT_TOKEN;
+
+client.login(token);
+
+client.once(Events.ClientReady, () => {
+    console.log(`${client.user.tag} hazır!`);
+
+    // Opsiyonel: Discord’daki bot statüsünü ayarlayabilirsin
+    client.user.setPresence({
+        activities: [{ name: "Sunucunuzu koruyor!", type: 0 }], // type: 0 = Playing
+        status: "online"
+    });
+});
