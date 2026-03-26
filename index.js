@@ -219,7 +219,11 @@ if (interaction.customId === "sikayetModal") {
     content: "✅ Şikayet gönderildi!",
     ephemeral: true
   });
-}
+}    
+    
+  }
+  
+});
 
 // TOKEN
 if (!config.BOT_TOKEN) {
