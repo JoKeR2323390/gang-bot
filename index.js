@@ -59,7 +59,7 @@ client.once(Events.ClientReady, async () => {
     );
 
     basvuruChannel.send({
-      content: `:wave: Ballas Gange Hoş Geldin!\nBaşvuru için butona bas.`,
+      content: `:wave: Ballas Gange Hoş Geldin!\nBaşvuru için butona bas @everyone.`,
       components: [row]
     });
   }
@@ -75,7 +75,8 @@ client.once(Events.ClientReady, async () => {
     );
 
     sikayetChannel.send({
-      content: `Şikayet için butona bas.`,
+      content: `Şikayetiniz Varsa Aşağıdaki Butona Tıklayın ve Şikayetinizi Yazın.
+Boss/OG Şikayetinizle En Kısa Sürede İlgilenecektir @everyone.`,
       components: [row2]
     });
   }
