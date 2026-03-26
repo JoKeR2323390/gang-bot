@@ -160,25 +160,66 @@ client.on(Events.InteractionCreate, async interaction => {
   // MODAL
   if (interaction.isModalSubmit()) {
 
-    if (interaction.customId === "basvuruModal") {
-      const log = client.channels.cache.get(config.BASVURU_LOG);
-      if (!log) return;
+   if (interaction.customId === "basvuruModal") {
+  const log = client.channels.cache.get(config.BASVURU_LOG);
+  if (!log) return;
 
-      log.send(`👤 ${interaction.user}\nBaşvuru geldi`);
+  const soru1 = interaction.fields.getTextInputValue("soru1");
+  const soru2 = interaction.fields.getTextInputValue("soru2");
+  const soru3 = interaction.fields.getTextInputValue("soru3");
+  const soru4 = interaction.fields.getTextInputValue("soru4");
+  const soru5 = interaction.fields.getTextInputValue("soru5");
 
-      return interaction.reply({ content: "Başvuru gönderildi", ephemeral: true });
-    }
+  const mesaj = `
+📋 **Yeni Başvuru!**
 
-    if (interaction.customId === "sikayetModal") {
-      const log = client.channels.cache.get(config.SIKAYET_LOG);
-      if (!log) return;
+👤 Kullanıcı: ${interaction.user.tag}
 
-      log.send(`🚨 ${interaction.user}\nŞikayet geldi`);
+1️⃣ Fivem Saatin: ${soru1}
+2️⃣ Aimine Kaç veriyorsun: ${soru2}
+3️⃣ Harita Bilgin varmı: ${soru3}
+4️⃣ Kuralları kabul ediyormusun: ${soru4}
+5️⃣ Çıkınca CK yemeyi kabul ediyormuusn: ${soru5}
 
-      return interaction.reply({ content: "Şikayet gönderildi", ephemeral: true });
-    }
-  }
-});
+<@&${config.ALIM_GOREVLI_ROLE}>
+`;
+
+  await log.send(mesaj);
+
+  await interaction.reply({
+    content: "✅ Başvurun gönderildi!",
+    ephemeral: true
+  });
+}
+
+if (interaction.customId === "sikayetModal") {
+  const log = client.channels.cache.get(config.SIKAYET_LOG);
+  if (!log) return;
+
+  const kisi = interaction.fields.getTextInputValue("kisi");
+  const sebep = interaction.fields.getTextInputValue("sebep");
+  const kanit = interaction.fields.getTextInputValue("kanit");
+  const extra = interaction.fields.getTextInputValue("extra");
+
+  const mesaj = `
+🚨 **Yeni Şikayet!**
+
+👤 Şikayet Eden: ${interaction.user.tag}
+🎯 Şikayet Edilen: ${kisi}
+📄 Sebep: ${sebep}
+📎 Kanıt: ${kanit || "Yok"}
+➕ Extra: ${extra || "Yok"}
+
+<@&${config.BOSS_ROLE}> <@&${config.OG_ROLE}>
+`;
+
+  await log.send(mesaj);
+
+  await interaction.reply({
+    content: "✅ Şikayet gönderildi!",
+    ephemeral: true
+  });
+}
 
 // TOKEN
 if (!config.BOT_TOKEN) {
