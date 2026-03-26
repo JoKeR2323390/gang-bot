@@ -114,19 +114,19 @@ client.on(Events.InteractionCreate, async interaction => {
 
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId("soru1").setLabel("OCC + Saat").setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru1").setLabel("Aktiflik Süren").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId("soru2").setLabel("Aim").setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru2").setLabel("Aimine Kaç veriyorsun 10/?").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId("soru3").setLabel("Harita").setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru3").setLabel("Harita Bilgin").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId("soru4").setLabel("Kurallar").setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru4").setLabel("Kuralları Kabul Ediyormusun").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId("soru5").setLabel("CK").setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru5").setLabel("Çıkınca Ck yemeyi kabul ediyormusun").setStyle(TextInputStyle.Short)
         )
       );
 
