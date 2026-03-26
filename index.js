@@ -11,13 +11,9 @@ const {
   Events
 } = require("discord.js");
 
-// ---------------------
-// CONFIG JSON YERİNE ENVIRONMENT VARIABLES
-// ---------------------
+// CONFIG
 const config = {
   BOT_TOKEN: process.env.BOT_TOKEN,
-  BOT_ID: process.env.BOT_ID,
-  SUNUCU_ID: process.env.SUNUCU_ID,
   MOD_LOG_CHANNEL: process.env.MOD_LOG_CHANNEL,
   BASVURU_CHANNEL: process.env.BASVURU_CHANNEL,
   BASVURU_LOG: process.env.BASVURU_LOG,
@@ -42,21 +38,17 @@ client.commands = new Collection();
 const moderasyon = require("./moderasyon.js");
 const temizleme = require("./temizleme.js");
 
-// ---------------------
-// KOMUT YÜKLE
-// ---------------------
-for (const cmd of moderasyon.data) {
-  client.commands.set(cmd.name, cmd);
+// ✅ DOĞRU KOMUT YÜKLEME
+for (const cmd of moderasyon) {
+  client.commands.set(cmd.data.name, cmd);
 }
 client.commands.set(temizleme.data.name, temizleme);
 
-// ---------------------
-// BOT READY EVENT
-// ---------------------
+// READY
 client.once(Events.ClientReady, async () => {
   console.log(`${client.user.tag} aktif!`);
 
-  // 📌 MÜLAKAT MESAJI
+  // BAŞVURU MESAJI
   const basvuruChannel = client.channels.cache.get(config.BASVURU_CHANNEL);
   if (basvuruChannel) {
     const row = new ActionRowBuilder().addComponents(
@@ -67,12 +59,12 @@ client.once(Events.ClientReady, async () => {
     );
 
     basvuruChannel.send({
-      content: `:wave: Ballas Gange Hoş Geldin!\nMülakata Başvurmak için aşağıdaki butona tıklayın.\n@everyone`,
+      content: `:wave: Ballas Gange Hoş Geldin!\nBaşvuru için butona bas.`,
       components: [row]
     });
   }
 
-  // 📌 ŞİKAYET MESAJI
+  // ŞİKAYET MESAJI
   const sikayetChannel = client.channels.cache.get(config.SIKAYET_CHANNEL);
   if (sikayetChannel) {
     const row2 = new ActionRowBuilder().addComponents(
@@ -83,166 +75,114 @@ client.once(Events.ClientReady, async () => {
     );
 
     sikayetChannel.send({
-      content: `@everyone\nŞikayetiniz Varsa Aşağıdaki Butona Tıklayın ve Şikayetinizi Yazın.\nBoss/OG Şikayetinizle En Kısa Sürede İlgilenecektir.`,
+      content: `Şikayet için butona bas.`,
       components: [row2]
     });
   }
+
+  // STATUS
+  client.user.setPresence({
+    activities: [{ name: "Sunucunuzu koruyor!", type: 0 }],
+    status: "online"
+  });
 });
 
-// ---------------------
-// INTERACTION CREATE
-// ---------------------
+// INTERACTION
 client.on(Events.InteractionCreate, async interaction => {
 
-  // KOMUTLAR
+  // KOMUT
   if (interaction.isChatInputCommand()) {
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
 
     try {
-      await command.execute(interaction, client);
+      await command.execute(interaction, config, client); // ✅ FIX
     } catch (err) {
       console.error(err);
       interaction.reply({ content: "Hata oluştu", ephemeral: true });
     }
   }
 
-  // BUTONLAR
+  // BUTON
   if (interaction.isButton()) {
+
     if (interaction.customId === "basvuru") {
       const modal = new ModalBuilder()
         .setCustomId("basvuruModal")
-        .setTitle("Ballas Başvuru");
+        .setTitle("Başvuru");
 
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("soru1")
-            .setLabel("OCC İsim ve Fivem Saatin")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru1").setLabel("OCC + Saat").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("soru2")
-            .setLabel("Aimine Kaç Puan verirsin")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru2").setLabel("Aim").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("soru3")
-            .setLabel("Harita Bilgin Var mı")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru3").setLabel("Harita").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("soru4")
-            .setLabel("Kuralları Kabul Ediyor musun")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru4").setLabel("Kurallar").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("soru5")
-            .setLabel("CK kabul ediyor musun")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("soru5").setLabel("CK").setStyle(TextInputStyle.Short)
         )
       );
 
-      await interaction.showModal(modal);
+      return interaction.showModal(modal);
     }
 
     if (interaction.customId === "sikayet") {
       const modal = new ModalBuilder()
         .setCustomId("sikayetModal")
-        .setTitle("Şikayet Formu");
+        .setTitle("Şikayet");
 
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("kisi")
-            .setLabel("Şikayet edilen kişi")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("kisi").setLabel("Kişi").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("sebep")
-            .setLabel("Sebep")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("sebep").setLabel("Sebep").setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("kanit")
-            .setLabel("Kanıt")
-            .setStyle(TextInputStyle.Paragraph)
+          new TextInputBuilder().setCustomId("kanit").setLabel("Kanıt").setStyle(TextInputStyle.Paragraph)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId("extra")
-            .setLabel("Extra")
-            .setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId("extra").setLabel("Extra").setStyle(TextInputStyle.Short)
         )
       );
 
-      await interaction.showModal(modal);
+      return interaction.showModal(modal);
     }
   }
 
-  // MODAL SUBMIT
+  // MODAL
   if (interaction.isModalSubmit()) {
-    // BAŞVURU
+
     if (interaction.customId === "basvuruModal") {
       const log = client.channels.cache.get(config.BASVURU_LOG);
-      const mesaj = `
-👤 ${interaction.user}
+      if (!log) return;
 
-1️⃣ OCC: ${interaction.fields.getTextInputValue("soru1")}
-2️⃣ Aim: ${interaction.fields.getTextInputValue("soru2")}
-3️⃣ Harita: ${interaction.fields.getTextInputValue("soru3")}
-4️⃣ Kurallar: ${interaction.fields.getTextInputValue("soru4")}
-5️⃣ CK: ${interaction.fields.getTextInputValue("soru5")}
+      log.send(`👤 ${interaction.user}\nBaşvuru geldi`);
 
-<@&${config.ALIM_GOREVLI_ROLE}>
-`;
-      log.send(mesaj);
-      interaction.reply({ content: "Başvuru gönderildi", ephemeral: true });
+      return interaction.reply({ content: "Başvuru gönderildi", ephemeral: true });
     }
 
-    // ŞİKAYET
     if (interaction.customId === "sikayetModal") {
       const log = client.channels.cache.get(config.SIKAYET_LOG);
-      const mesaj = `
-🚨 ${interaction.user}
+      if (!log) return;
 
-👤 Kişi: ${interaction.fields.getTextInputValue("kisi")}
-📄 Sebep: ${interaction.fields.getTextInputValue("sebep")}
-📎 Kanıt: ${interaction.fields.getTextInputValue("kanit")}
-➕ Extra: ${interaction.fields.getTextInputValue("extra")}
+      log.send(`🚨 ${interaction.user}\nŞikayet geldi`);
 
-<@&${config.BOSS_ROLE}> <@&${config.OG_ROLE}>
-`;
-      log.send(mesaj);
-      interaction.reply({ content: "Şikayet gönderildi", ephemeral: true });
+      return interaction.reply({ content: "Şikayet gönderildi", ephemeral: true });
     }
   }
 });
 
-// ---------------------
-// BOT LOGIN VE READY
-// ---------------------
-const token = process.env.BOT_TOKEN;
-
-if (!token) {
-    console.error("Hata: BOT_TOKEN environment variable tanımlı değil!");
-    process.exit(1); // Botu durdur
+// TOKEN
+if (!config.BOT_TOKEN) {
+  console.error("❌ TOKEN YOK");
+  process.exit(1);
 }
 
-client.login(token);
-
-client.once(Events.ClientReady, () => {
-    console.log(`${client.user.tag} hazır!`);
-
-    // Opsiyonel: Discord’daki bot statüsünü ayarlayabilirsin
-    client.user.setPresence({
-        activities: [{ name: "Sunucunuzu koruyor!", type: 0 }], // 0 = Playing
-        status: "online"
-    });
-});
+client.login(config.BOT_TOKEN);
