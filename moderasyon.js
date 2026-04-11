@@ -4,7 +4,7 @@ module.exports = [
 
 {
 data: new SlashCommandBuilder()
-.setName("ballasban")
+.setName("777ban")
 .setDescription("Kullanıcıyı banlar")
 .addUserOption(o =>
 o.setName("kullanici").setDescription("Banlanacak kişi").setRequired(true))
@@ -34,7 +34,7 @@ log.send(`🔨 ${interaction.user.tag} → ${user.tag} banladı\nSebep: ${sebep}
 
 {
 data: new SlashCommandBuilder()
-.setName("ballaskick")
+.setName("777kick")
 .setDescription("Kullanıcıyı kickler")
 .addUserOption(o =>
 o.setName("kullanici").setDescription("Kicklenecek kişi").setRequired(true))
@@ -64,7 +64,7 @@ log.send(`👢 ${interaction.user.tag} → ${user.tag} kickledi\nSebep: ${sebep}
 
 {
 data: new SlashCommandBuilder()
-.setName("ballastimeout")
+.setName("777timeout")
 .setDescription("Timeout atar")
 .addUserOption(o =>
 o.setName("kullanici").setDescription("Kullanıcı").setRequired(true))
@@ -107,7 +107,7 @@ log.send(`⏳ ${interaction.user.tag} → ${user.user.tag} timeout attı\nSebep:
 
 {
 data: new SlashCommandBuilder()
-.setName("timeoutkaldir")
+.setName("777timeoutkaldir")
 .setDescription("Timeout kaldırır")
 .addUserOption(o =>
 o.setName("kullanici").setDescription("Kullanıcı").setRequired(true)),
@@ -131,7 +131,7 @@ log.send(`✅ ${interaction.user.tag} → ${user.user.tag} timeout kaldırdı`);
 
 {
 data: new SlashCommandBuilder()
-.setName("ballasunban")
+.setName("777unban")
 .setDescription("Ban kaldırır")
 .addStringOption(o =>
 o.setName("id").setDescription("ID").setRequired(true)),
@@ -153,7 +153,7 @@ log.send(`♻️ ${interaction.user.tag} → ${id} unbanladı`);
 
 {
 data: new SlashCommandBuilder()
-.setName("gangduyuru")
+.setName("777duyuru")
 .setDescription("Duyuru yapar")
 .addStringOption(o =>
 o.setName("mesaj").setDescription("Mesaj").setRequired(true)),
