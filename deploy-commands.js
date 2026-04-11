@@ -6,12 +6,12 @@ const temizleme = require("./temizleme.js");
 
 const commands = [];
 
-// Moderasyon komutlarını ekle
-for (const cmd of moderasyon.data) {
-  commands.push(cmd.toJSON());
+// ✅ Moderasyon (ARRAY)
+for (const cmd of moderasyon) {
+  commands.push(cmd.data.toJSON());
 }
 
-// Temizleme komutunu ekle
+// ✅ Temizleme
 commands.push(temizleme.data.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(config.BOT_TOKEN);
