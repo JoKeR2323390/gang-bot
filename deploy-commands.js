@@ -1,17 +1,16 @@
 const { REST, Routes } = require("discord.js");
-const config = require("./config.json");
 
 const moderasyon = require("./moderasyon.js");
 const temizleme = require("./temizleme.js");
 
 const commands = [];
 
-// moderasyon (array)
+// moderasyon
 for (const cmd of moderasyon) {
   commands.push(cmd.data.toJSON());
 }
 
-// temizleme (tek komut veya array)
+// temizleme (array veya tek)
 if (Array.isArray(temizleme)) {
   for (const cmd of temizleme) {
     commands.push(cmd.data.toJSON());
@@ -20,21 +19,28 @@ if (Array.isArray(temizleme)) {
   commands.push(temizleme.data.toJSON());
 }
 
-const rest = new REST({ version: "10" }).setToken(config.BOT_TOKEN);
+// ENV TOKEN CHECK
+const token = process.env.BOT_TOKEN;
+const clientId = process.env.BOT_ID;
+const guildId = process.env.SUNUCU_ID;
+
+if (!token) {
+  console.error("❌ BOT_TOKEN yok (Railway ENV)");
+  process.exit(1);
+}
+
+const rest = new REST({ version: "10" }).setToken(token);
 
 (async () => {
   try {
-    console.log("🚀 Slash komutlar yükleniyor...");
+    console.log("🚀 Deploy başlıyor...");
 
     await rest.put(
-      Routes.applicationGuildCommands(
-        config.BOT_ID,
-        config.SUNUCU_ID
-      ),
+      Routes.applicationGuildCommands(clientId, guildId),
       { body: commands }
     );
 
-    console.log("✅ KOMUTLAR YÜKLENDİ");
+    console.log("✅ Slash komutlar yüklendi");
   } catch (err) {
     console.error("❌ DEPLOY HATA:", err);
   }
