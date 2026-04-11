@@ -38,7 +38,7 @@ client.commands = new Collection();
 const moderasyon = require("./moderasyon.js");
 const temizleme = require("./temizleme.js");
 
-require("./deploy.js");
+require("./deploy-commands.js");
 
 // KOMUT YÜKLE
 for (const cmd of moderasyon) {
