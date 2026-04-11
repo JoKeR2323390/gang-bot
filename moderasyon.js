@@ -21,14 +21,12 @@ return interaction.reply({content:"Yetkin yok",ephemeral:true});
 const user = interaction.options.getUser("kullanici");
 const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-await interaction.guild.members.ban(user.id,{reason:sebep});
+await interaction.guild.members.ban(user.id, { reason: sebep });
 
 await interaction.reply(`${user.tag} banlandı`);
 
-const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
-if(log){
-log.send(`🔨 ${interaction.user.tag} → ${user.tag} banladı\nSebep: ${sebep}`);
-}
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL).catch(()=>null);
+if(log) log.send(`🔨 ${interaction.user.tag} → ${user.tag} BAN | ${sebep}`);
 }
 },
 
@@ -49,16 +47,18 @@ return interaction.reply({content:"Yetkin yok",ephemeral:true});
 }
 
 const user = interaction.options.getUser("kullanici");
+const member = await interaction.guild.members.fetch(user.id).catch(()=>null);
 const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-await interaction.guild.members.kick(user.id,sebep);
+if(!member)
+return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
+
+await member.kick(sebep);
 
 await interaction.reply(`${user.tag} kicklendi`);
 
-const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
-if(log){
-log.send(`👢 ${interaction.user.tag} → ${user.tag} kickledi\nSebep: ${sebep}`);
-}
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL).catch(()=>null);
+if(log) log.send(`👢 ${interaction.user.tag} → ${user.tag} KICK | ${sebep}`);
 }
 },
 
@@ -88,20 +88,19 @@ if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
 return interaction.reply({content:"Yetkin yok",ephemeral:true});
 }
 
-const user = interaction.options.getMember("kullanici");
+const member = interaction.options.getMember("kullanici");
 const sure = interaction.options.getString("sure");
 const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
+if(!member)
+return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
 
-await user.timeout(parseInt(sure),sebep);
+await member.timeout(parseInt(sure), sebep);
 
-await interaction.reply(`${user.user.tag} timeout yedi`);
+await interaction.reply(`${member.user.tag} timeout yedi`);
 
-const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
-if(log){
-log.send(`⏳ ${interaction.user.tag} → ${user.user.tag} timeout attı\nSebep: ${sebep}`);
-}
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL).catch(()=>null);
+if(log) log.send(`⏳ ${interaction.user.tag} → ${member.user.tag} TIMEOUT | ${sebep}`);
 }
 },
 
@@ -114,18 +113,22 @@ o.setName("kullanici").setDescription("Kullanıcı").setRequired(true)),
 
 async execute(interaction, config, client){
 
-const user = interaction.options.getMember("kullanici");
-
-if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
-
-await user.timeout(null);
-
-await interaction.reply(`${user.user.tag} timeout kaldırıldı`);
-
-const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
-if(log){
-log.send(`✅ ${interaction.user.tag} → ${user.user.tag} timeout kaldırdı`);
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
 }
+
+const member = interaction.options.getMember("kullanici");
+
+if(!member)
+return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
+
+await member.timeout(0);
+
+await interaction.reply(`${member.user.tag} timeout kaldırıldı`);
+
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL).catch(()=>null);
+if(log) log.send(`✅ ${interaction.user.tag} → ${member.user.tag} TIMEOUT KALDIRILDI`);
 }
 },
 
@@ -134,9 +137,14 @@ data: new SlashCommandBuilder()
 .setName("777unban")
 .setDescription("Ban kaldırır")
 .addStringOption(o =>
-o.setName("id").setDescription("ID").setRequired(true)),
+o.setName("id").setDescription("User ID").setRequired(true)),
 
 async execute(interaction, config, client){
+
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
 
 const id = interaction.options.getString("id");
 
@@ -144,10 +152,8 @@ await interaction.guild.members.unban(id);
 
 await interaction.reply(`Ban kaldırıldı: ${id}`);
 
-const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
-if(log){
-log.send(`♻️ ${interaction.user.tag} → ${id} unbanladı`);
-}
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL).catch(()=>null);
+if(log) log.send(`♻️ ${interaction.user.tag} → UNBAN ${id}`);
 }
 },
 
@@ -162,7 +168,7 @@ async execute(interaction){
 
 const mesaj = interaction.options.getString("mesaj");
 
-await interaction.channel.send(`@everyone\n${mesaj}`);
+await interaction.channel.send(`@everyone\n📢 ${mesaj}`);
 
 await interaction.reply({content:"Duyuru gönderildi",ephemeral:true});
 }
