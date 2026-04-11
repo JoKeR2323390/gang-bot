@@ -11,8 +11,6 @@ const {
   Events
 } = require("discord.js");
 
-const config = require("./config.json");
-
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -21,10 +19,25 @@ const client = new Client({
   ]
 });
 
+// ENV CONFIG
+const config = {
+  BOT_TOKEN: process.env.BOT_TOKEN,
+  BOT_ID: process.env.BOT_ID,
+  SUNUCU_ID: process.env.SUNUCU_ID,
+  MOD_LOG_CHANNEL: process.env.MOD_LOG_CHANNEL,
+  BASVURU_CHANNEL: process.env.BASVURU_CHANNEL,
+  BASVURU_LOG: process.env.BASVURU_LOG,
+  SIKAYET_CHANNEL: process.env.SIKAYET_CHANNEL,
+  SIKAYET_LOG: process.env.SIKAYET_LOG,
+  BOSS_ROLE: process.env.BOSS_ROLE,
+  OG_ROLE: process.env.OG_ROLE
+};
+
 client.commands = new Collection();
 
 const moderasyon = require("./moderasyon.js");
 const temizleme = require("./temizleme.js");
+
 require("./deploy-commands.js");
 
 // COMMAND LOAD
@@ -37,7 +50,7 @@ client.commands.set(temizleme.data.name, temizleme);
 client.once(Events.ClientReady, async () => {
   console.log(`${client.user.tag} aktif!`);
 
-  const basvuru = await client.channels.fetch(config.BASVURU_CHANNEL).catch(() => null);
+  const basvuru = await client.channels.fetch(config.BASVURU_CHANNEL).catch(()=>null);
   if (basvuru) {
     await basvuru.send({
       content: "777 Family Başvuru Sistemi",
@@ -52,7 +65,7 @@ client.once(Events.ClientReady, async () => {
     });
   }
 
-  const sikayet = await client.channels.fetch(config.SIKAYET_CHANNEL).catch(() => null);
+  const sikayet = await client.channels.fetch(config.SIKAYET_CHANNEL).catch(()=>null);
   if (sikayet) {
     await sikayet.send({
       content: "777 Family Şikayet Sistemi",
@@ -73,15 +86,14 @@ client.once(Events.ClientReady, async () => {
   });
 });
 
-// INTERACTION (FULL SAFE)
+// INTERACTIONS
 client.on(Events.InteractionCreate, async interaction => {
   try {
 
-    // SLASH COMMANDS
+    // COMMANDS
     if (interaction.isChatInputCommand()) {
       const cmd = client.commands.get(interaction.commandName);
       if (!cmd) return;
-
       return await cmd.execute(interaction, config, client);
     }
 
@@ -107,7 +119,7 @@ client.on(Events.InteractionCreate, async interaction => {
             new TextInputBuilder().setCustomId("soru4").setLabel("Kurallar").setStyle(TextInputStyle.Short)
           ),
           new ActionRowBuilder().addComponents(
-            new TextInputBuilder().setCustomId("soru5").setLabel("CK Kabul").setStyle(TextInputStyle.Short)
+            new TextInputBuilder().setCustomId("soru5").setLabel("CK").setStyle(TextInputStyle.Short)
           )
         );
 
@@ -142,11 +154,11 @@ client.on(Events.InteractionCreate, async interaction => {
     if (interaction.isModalSubmit()) {
 
       if (interaction.customId === "basvuruModal") {
-        const log = await client.channels.fetch(config.BASVURU_LOG).catch(() => null);
-        if (!log) return interaction.reply({ content: "Log yok", ephemeral: true });
+        const log = await client.channels.fetch(config.BASVURU_LOG).catch(()=>null);
+        if (!log) return;
 
         await log.send(
-`📋 777 Family Başvuru
+`📋 777 FAMILY BAŞVURU
 👤 ${interaction.user.tag}
 1️⃣ ${interaction.fields.getTextInputValue("soru1")}
 2️⃣ ${interaction.fields.getTextInputValue("soru2")}
@@ -159,11 +171,11 @@ client.on(Events.InteractionCreate, async interaction => {
       }
 
       if (interaction.customId === "sikayetModal") {
-        const log = await client.channels.fetch(config.SIKAYET_LOG).catch(() => null);
-        if (!log) return interaction.reply({ content: "Log yok", ephemeral: true });
+        const log = await client.channels.fetch(config.SIKAYET_LOG).catch(()=>null);
+        if (!log) return;
 
         await log.send(
-`🚨 777 Family Şikayet
+`🚨 777 FAMILY ŞİKAYET
 👤 ${interaction.user.tag}
 🎯 ${interaction.fields.getTextInputValue("kisi")}
 📄 ${interaction.fields.getTextInputValue("sebep")}
@@ -173,15 +185,18 @@ client.on(Events.InteractionCreate, async interaction => {
 
         return interaction.reply({ content: "Şikayet gönderildi", ephemeral: true });
       }
+
     }
 
   } catch (err) {
-    console.error("GLOBAL HATA:", err);
-
-    if (interaction.isRepliable()) {
-      interaction.reply({ content: "Bir hata oluştu", ephemeral: true }).catch(() => {});
-    }
+    console.error("HATA:", err);
   }
 });
+
+// LOGIN
+if (!config.BOT_TOKEN) {
+  console.error("❌ BOT_TOKEN yok");
+  process.exit(1);
+}
 
 client.login(config.BOT_TOKEN);
