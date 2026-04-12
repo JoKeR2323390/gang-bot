@@ -2,103 +2,229 @@ const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = [
 
+/* ================= BAN ================= */
 {
 data: new SlashCommandBuilder()
 .setName("777ban")
-.setDescription("Ban")
+.setDescription("Kullanıcıyı banlar")
 .addUserOption(o =>
-o.setName("kullanici").setRequired(true))
+o.setName("kullanici").setDescription("Banlanacak kişi").setRequired(true))
 .addStringOption(o =>
-o.setName("sebep")),
+o.setName("sebep").setDescription("Sebep")),
 
 async execute(interaction, config, client){
 
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
+
 const user = interaction.options.getUser("kullanici");
-const sebep = interaction.options.getString("sebep") || "Yok";
+const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-await interaction.guild.members.ban(user.id, { reason: sebep });
-
+await interaction.guild.members.ban(user.id,{reason:sebep});
 await interaction.reply(`${user.tag} banlandı`);
+
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
+if(log){
+log.send(`🔨 ${interaction.user.tag} → ${user.tag} banladı\nSebep: ${sebep}`);
+}
 }
 },
 
+/* ================= KICK ================= */
 {
 data: new SlashCommandBuilder()
 .setName("777kick")
-.setDescription("Kick")
+.setDescription("Kullanıcıyı kickler")
 .addUserOption(o =>
-o.setName("kullanici").setRequired(true)),
+o.setName("kullanici").setDescription("Kicklenecek kişi").setRequired(true))
+.addStringOption(o =>
+o.setName("sebep").setDescription("Sebep")),
 
 async execute(interaction, config, client){
 
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
+
 const user = interaction.options.getUser("kullanici");
-const member = await interaction.guild.members.fetch(user.id);
+const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-await member.kick();
-
+await interaction.guild.members.kick(user.id,sebep);
 await interaction.reply(`${user.tag} kicklendi`);
+
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
+if(log){
+log.send(`👢 ${interaction.user.tag} → ${user.tag} kickledi\nSebep: ${sebep}`);
+}
 }
 },
 
+/* ================= TIMEOUT ================= */
 {
 data: new SlashCommandBuilder()
 .setName("777timeout")
-.setDescription("Timeout")
-.addUserOption(o => o.setName("kullanici").setRequired(true))
-.addStringOption(o => o.setName("sure").setRequired(true)
+.setDescription("Timeout atar")
+.addUserOption(o =>
+o.setName("kullanici").setDescription("Kullanıcı").setRequired(true))
+.addStringOption(o =>
+o.setName("sure")
+.setDescription("Süre")
+.setRequired(true)
 .addChoices(
-{name:"1 dk",value:"60000"},
-{name:"5 dk",value:"300000"},
-{name:"10 dk",value:"600000"},
-{name:"1 saat",value:"3600000"}
-)),
+{name:"10 saniye", value:"10000"},
+{name:"30 saniye", value:"30000"},
+{name:"1 dakika", value:"60000"},
+{name:"5 dakika", value:"300000"},
+{name:"10 dakika", value:"600000"},
+{name:"1 saat", value:"3600000"}
+))
+.addStringOption(o =>
+o.setName("sebep").setDescription("Sebep")),
 
 async execute(interaction, config, client){
 
-const user = await interaction.guild.members.fetch(
-interaction.options.getUser("kullanici").id
-);
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
 
+const user = interaction.options.getMember("kullanici");
 const sure = interaction.options.getString("sure");
+const sebep = interaction.options.getString("sebep") || "Sebep yok";
 
-await user.timeout(Number(sure));
+if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
 
-await interaction.reply("timeout atıldı");
+await user.timeout(parseInt(sure),sebep);
+await interaction.reply(`${user.user.tag} timeout yedi`);
+
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
+if(log){
+log.send(`⏳ ${interaction.user.tag} → ${user.user.tag} timeout attı\nSüre: ${sure}ms\nSebep: ${sebep}`);
+}
 }
 },
 
+/* ================= TIMEOUT KALDIR ================= */
 {
 data: new SlashCommandBuilder()
 .setName("777timeoutkaldir")
-.setDescription("Timeout kaldır")
-.addUserOption(o => o.setName("kullanici").setRequired(true)),
+.setDescription("Timeout kaldırır")
+.addUserOption(o =>
+o.setName("kullanici").setDescription("Kullanıcı").setRequired(true)),
 
 async execute(interaction, config, client){
 
-const user = await interaction.guild.members.fetch(
-interaction.options.getUser("kullanici").id
-);
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
+
+const user = interaction.options.getMember("kullanici");
+if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
 
 await user.timeout(null);
+await interaction.reply(`${user.user.tag} timeout kaldırıldı`);
 
-await interaction.reply("timeout kaldırıldı");
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
+if(log){
+log.send(`✅ ${interaction.user.tag} → ${user.user.tag} timeout kaldırdı`);
+}
 }
 },
 
+/* ================= UNBAN ================= */
 {
 data: new SlashCommandBuilder()
 .setName("777unban")
-.setDescription("Unban")
+.setDescription("Ban kaldırır")
 .addStringOption(o =>
-o.setName("id").setRequired(true)),
+o.setName("id").setDescription("ID").setRequired(true)),
+
+async execute(interaction, config, client){
+
+const id = interaction.options.getString("id");
+
+await interaction.guild.members.unban(id);
+await interaction.reply(`Ban kaldırıldı: ${id}`);
+
+const log = await client.channels.fetch(config.MOD_LOG_CHANNEL);
+if(log){
+log.send(`♻️ ${interaction.user.tag} → ${id} unbanladı`);
+}
+}
+},
+
+/* ================= DUYURU ================= */
+{
+data: new SlashCommandBuilder()
+.setName("777duyuru")
+.setDescription("Duyuru yapar")
+.addStringOption(o =>
+o.setName("mesaj").setDescription("Mesaj").setRequired(true)),
 
 async execute(interaction){
 
-await interaction.guild.members.unban(
-interaction.options.getString("id")
-);
+const mesaj = interaction.options.getString("mesaj");
 
-await interaction.reply("unbanlandı");
+await interaction.channel.send(`@everyone\n${mesaj}`);
+await interaction.reply({content:"Duyuru gönderildi",ephemeral:true});
+}
+},
+
+/* ================= ROL VER ================= */
+{
+data: new SlashCommandBuilder()
+.setName("777rolver")
+.setDescription("Rol verir")
+.addUserOption(o =>
+o.setName("kullanici").setDescription("Kişi").setRequired(true))
+.addRoleOption(o =>
+o.setName("rol").setDescription("Rol").setRequired(true)),
+
+async execute(interaction, config){
+
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
+
+const user = interaction.options.getMember("kullanici");
+const rol = interaction.options.getRole("rol");
+
+if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
+
+await user.roles.add(rol);
+await interaction.reply(`✅ ${user.user.tag} → ${rol.name} verildi`);
+}
+},
+
+/* ================= ROL AL ================= */
+{
+data: new SlashCommandBuilder()
+.setName("777rolal")
+.setDescription("Rol alır")
+.addUserOption(o =>
+o.setName("kullanici").setDescription("Kişi").setRequired(true))
+.addRoleOption(o =>
+o.setName("rol").setDescription("Rol").setRequired(true)),
+
+async execute(interaction, config){
+
+if(!interaction.member.roles.cache.has(config.BOSS_ROLE) &&
+!interaction.member.roles.cache.has(config.OG_ROLE)){
+return interaction.reply({content:"Yetkin yok",ephemeral:true});
+}
+
+const user = interaction.options.getMember("kullanici");
+const rol = interaction.options.getRole("rol");
+
+if(!user) return interaction.reply({content:"Kullanıcı bulunamadı",ephemeral:true});
+
+await user.roles.remove(rol);
+await interaction.reply(`❌ ${user.user.tag} → ${rol.name} alındı`);
 }
 }
 
