@@ -60,7 +60,7 @@ client.once(Events.ClientReady, async () => {
     );
 
     await basvuruChannel.send({
-      content: "📢 777 FAMILY BAŞVURU @everyone",
+      content: "📢 777 FAMILYE HOŞ GELDİNİZ. AİLEYE KATILMAK İÇİN AŞŞAĞIDAKİ BAŞVURU YAP BUTONUNA TIKLAYIP BAŞVURU YAPINIZ. @everyone",
       components: [row]
     });
   }
@@ -76,7 +76,7 @@ client.once(Events.ClientReady, async () => {
     );
 
     await sikayetChannel.send({
-      content: "🚨 777 FAMILY ŞİKAYET @everyone",
+      content: "🚨 Şikayetiniz Varsa Aşağıdaki Butona Tıklayın ve Şikayetinizi Yazın.Boss/OG Şikayetinizle En Kısa Sürede İlgilenecektir @everyone",
       components: [row]
     });
   }
