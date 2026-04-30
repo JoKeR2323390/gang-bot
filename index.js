@@ -37,7 +37,7 @@ const moderasyon = require("./moderasyon.js");
 const temizleme = require("./temizleme.js");
 
 // ❗ DEPLOY KALDIRILDI (EN ÖNEMLİ FIX)
-require("./deploy-commands.js"); ❌
+require("./deploy-commands.js"); 
 
 // KOMUT YÜKLE
 for (const cmd of moderasyon) {
